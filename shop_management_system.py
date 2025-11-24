@@ -7,8 +7,6 @@ class ShopManagementSystem:
         self.root.title("Shop Management System")
         self.root.geometry("1000x600")
         
-        # --- Data Model (High Level Dictionary) ---
-        # In a real app, this would come from a SQL Database
         self.products = {
             "Gaming Mouse": {"price": 2500, "stock": 10},
             "Mechanical Keyboard": {"price": 4500, "stock": 15},
@@ -18,33 +16,30 @@ class ShopManagementSystem:
             "Webcam": {"price": 4000, "stock": 12}
         }
         
-        # Cart storage list
+        
         self.cart_items = []
         self.total_bill_amount = 0
 
-        # --- Styles ---
+       
         style = ttk.Style()
         style.theme_use("clam")
         style.configure("Treeview", font=('Arial', 10), rowheight=25)
         style.configure("Treeview.Heading", font=('Arial', 11, 'bold'))
 
-        # --- UI Layout ---
-        
-        # Header
         header_frame = tk.Frame(self.root, bg="#2c3e50", height=80)
         header_frame.pack(fill=tk.X)
         title_label = tk.Label(header_frame, text="Tech Shop Inventory & Billing",font=("Helvetica", 24, "bold"), bg="#2c3e50", fg="white")
         title_label.pack(pady=20)
 
-        # Main Content Frame
+       
         content_frame = tk.Frame(self.root, padx=20, pady=20)
         content_frame.pack(fill=tk.BOTH, expand=True)
 
-        # LEFT SIDE: Inventory & Selection
+        
         left_frame = tk.LabelFrame(content_frame, text="Available Products", font=("Arial", 12, "bold"))
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
 
-        # Inventory Table
+      
         cols = ("Item Name", "Price", "Stock Left")
         self.inventory_tree = ttk.Treeview(left_frame, columns=cols, show='headings', height=15)
         self.inventory_tree.heading("Item Name", text="Item Name")
@@ -55,10 +50,10 @@ class ShopManagementSystem:
         self.inventory_tree.column("Stock Left", width=80)
         self.inventory_tree.pack(fill=tk.BOTH, expand=True, pady=10)
         
-        # Populate Inventory
+       
         self.refresh_inventory()
 
-        # Input Controls
+      
         control_frame = tk.Frame(left_frame)
         control_frame.pack(fill=tk.X, pady=10)
         
@@ -69,11 +64,11 @@ class ShopManagementSystem:
         add_btn = tk.Button(control_frame, text="Add to Cart", bg="#27ae60", fg="white",command=self.add_to_cart, font=("Arial", 10, "bold"))
         add_btn.pack(side=tk.LEFT, padx=20)
 
-        # RIGHT SIDE: Cart & Billing
+        
         right_frame = tk.LabelFrame(content_frame, text="Current Cart", font=("Arial", 12, "bold"))
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10)
 
-        # Cart Table
+       
         cart_cols = ("Item", "Qty", "Total")
         self.cart_tree = ttk.Treeview(right_frame, columns=cart_cols, show='headings', height=15)
         self.cart_tree.heading("Item", text="Item")
@@ -84,7 +79,7 @@ class ShopManagementSystem:
         self.cart_tree.column("Total", width=80)
         self.cart_tree.pack(fill=tk.BOTH, expand=True, pady=10)
 
-        # Footer Actions
+      
         footer_frame = tk.Frame(right_frame)
         footer_frame.pack(fill=tk.X, pady=10)
 
@@ -105,7 +100,7 @@ class ShopManagementSystem:
     def add_to_cart(self):
        
         
-        # 1. Get Selected Item
+   
         selected_item_id = self.inventory_tree.selection()
         if not selected_item_id:
             messagebox.showwarning("Selection Error", "Please select an item from the inventory list.")
@@ -116,7 +111,7 @@ class ShopManagementSystem:
         current_stock = int(item_values[2])
         item_price = float(item_values[1])
 
-        # 2. Get Quantity
+        
         try:
             qty_requested = int(self.qty_entry.get())
             if qty_requested <= 0:
@@ -125,19 +120,18 @@ class ShopManagementSystem:
             messagebox.showerror("Input Error", "Please enter a valid positive number for quantity.")
             return
 
-        # 3. Check Stock Logic
+      
         if qty_requested > current_stock:
             messagebox.showerror("Out of Stock", f"Only {current_stock} units of {item_name} available!")
             return
 
-        # 4. Update Data
-        # Reduce Stock
+  
         self.products[item_name]['stock']=self.products[item_name]['stock']-qty_requested
         
-        # Calculate Cost
+       
         total_cost = item_price * qty_requested
         
-        # Add to Cart Data
+    
         self.cart_items.append({
             "name": item_name,
             "qty": qty_requested,
@@ -145,12 +139,12 @@ class ShopManagementSystem:
         })
         self.total_bill_amount += total_cost
 
-        # 5. Update UI
+
         self.refresh_inventory() # Updates the stock number in the left panel
         self.cart_tree.insert("", tk.END, values=(item_name, qty_requested, total_cost))
         self.total_label.config(text=f"Total: ₹{self.total_bill_amount:.2f}")
         
-        # Clear entry
+ 
         self.qty_entry.delete(0, tk.END)
 
     def generate_bill(self):
@@ -159,7 +153,6 @@ class ShopManagementSystem:
             messagebox.showinfo("Empty Cart", "No items to bill.")
             return
 
-        # Create Receipt String
         bill_text = "====== SHOP RECEIPT ======\n\n"
         bill_text += f"{'Item':<20} {'Qty':<5} {'Price':<10}\n"
         bill_text += "-"*40 + "\n"
@@ -171,10 +164,9 @@ class ShopManagementSystem:
         bill_text += f"GRAND TOTAL: ₹{self.total_bill_amount:.2f}\n"
         bill_text += "=========================="
 
-        # Show Bill
+   
         messagebox.showinfo("Bill Generated", bill_text)
 
-        # Clear Cart UI and Data
         self.cart_items = []
         self.total_bill_amount = 0.0
         for item in self.cart_tree.get_children():
